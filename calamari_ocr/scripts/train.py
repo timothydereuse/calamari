@@ -1,5 +1,7 @@
+from contextlib import ExitStack
+
 from paiargparse import PAIArgumentParser
-from tfaip.util.logging import setup_log, logger
+from tfaip.util.logging import logger, WriteToLogFile
 
 from calamari_ocr import __version__
 from calamari_ocr.ocr.scenario import CalamariScenario
@@ -13,14 +15,15 @@ def run():
 
 
 def main(trainer_params: TrainerParams):
-    if trainer_params.output_dir:
-        setup_log(trainer_params.output_dir, append=False)
+    with ExitStack() as stack:
+        if trainer_params.output_dir:
+            stack.enter_context(WriteToLogFile(trainer_params.output_dir, append=False))
 
-    logger.info("trainer_params=" + trainer_params.to_json(indent=2))
+        logger.info("trainer_params=" + trainer_params.to_json(indent=2))
 
-    # create the trainer and run it
-    trainer = trainer_params.scenario.cls().create_trainer(trainer_params)
-    trainer.train()
+        # create the trainer and run it
+        trainer = trainer_params.scenario.cls().create_trainer(trainer_params)
+        trainer.train()
 
 
 def parse_args(args=None):

@@ -44,8 +44,8 @@ class TestValidationTrain(unittest.TestCase):
         args = eval_args(gt_data=FileDataParams(
             texts=sorted(glob_all([os.path.join(this_dir, "data", "uw3_50lines", "test", "*.gt.txt")]))
         ))
-        with tempfile.NamedTemporaryFile() as f:
-            args.xlsx_output = f.name
+        with tempfile.TemporaryDirectory() as d:
+            args.xlsx_output = os.path.join(d, 'output.xlsx')
             run_eval(args)
 
     def test_prediction_files_with_different_extension(self):
