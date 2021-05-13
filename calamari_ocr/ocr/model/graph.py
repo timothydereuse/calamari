@@ -49,7 +49,13 @@ class Graph(GraphBase[ModelParams]):
         self.layer_instances = [l.create() for l in params.layers]
 
         self.reshape = ToInputDimsLayerParams(dims=3).create()
-        self.logits = KL.Dense(params.classes, name='logits')
+
+        logits_regularizer = None
+        if params.weight_decay_logits > 0:
+            logits_regularizer = keras.regularizers.l2(l2=params.weight_decay_logits)
+        self.logits = KL.Dense(params.classes, name='logits',
+                               kernel_regularizer=logits_regularizer, bias_regularizer=logits_regularizer,
+                               )
         self.softmax = KL.Softmax(name='softmax')
 
     def call(self, inputs, **kwargs):

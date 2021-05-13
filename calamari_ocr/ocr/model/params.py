@@ -30,6 +30,7 @@ class ModelParams(ModelBaseParams):
     ctc_merge_repeated: bool = True
     ensemble: int = 0  # For usage with the ensemble-model graph
     masking_mode: int = False  # This parameter is for evaluation only and should not be used in production
+    weight_decay_logits: float = 0
 
     def __post_init__(self):
         # setup layer names
