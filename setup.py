@@ -39,7 +39,7 @@ setup(
             "calamari-dataset-statistics=calamari_ocr.scripts.dataset_statistics:main",
         ],
     },
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     install_requires=open("requirements.txt").read().split("\n"),
     keywords=["OCR", "optical character recognition", "ocropy", "ocropus", "kraken"],
     data_files=[("", ["requirements.txt"] + resources)],
