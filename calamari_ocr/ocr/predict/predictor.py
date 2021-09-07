@@ -1,4 +1,4 @@
-from typing import List, Iterable
+from typing import List
 
 from tensorflow import keras
 from tfaip import DataGeneratorParams
@@ -9,13 +9,6 @@ from tfaip.data.pipeline.processor.params import SequentialProcessorPipelinePara
 from tfaip.device.device_config import DeviceConfig
 import tfaip.imports as tfaip_cls
 from tfaip.predict.multimodelpredictor import MultiModelVoter
-
-from tfaip.util.multiprocessing.parallelmap import tqdm_wrapper
-from tfaip.data.pipeline.processor.params import SequentialProcessorPipelineParams
-from tfaip.predict.multimodelpostprocessor import MultiModelPostProcessorParams
-from tfaip import Sample, PipelineMode
-from tfaip import PredictorParams
-from tfaip.data.pipeline.datapipeline import DataPipeline
 
 from calamari_ocr.ocr.predict.params import PredictorParams
 from calamari_ocr.ocr.scenario import CalamariScenario
@@ -84,32 +77,5 @@ class MultiPredictor(tfaip_cls.MultiModelPredictor):
         ]
         post_proc = [p.create(self.params.pipeline, self.data.params) for p in post_proc_params]
         pre_proc = self.data.params.pre_proc.create(self.params.pipeline, self.data.params)
-
-        
         out_to_in_transformer = OutputToInputTransformer(pre_proc)
         return CalamariMultiModelVoter(self.voter_params, self.datas, post_proc, out_to_in_transformer)
-
-    def predict_pipeline(self, pipeline: DataPipeline) -> Iterable[Sample]:
-        # The pipeline prediction is overwritten since the batched results must be splitted into a single non-batched
-        # sample that comprised all individual prediction outputs as outputs.
-
-        voter = self.create_voter(self._data.params)
-        post_processors = [
-            d.get_or_create_pipeline(self.params.pipeline, pipeline.generator_params).create_output_pipeline()
-            for d in self._datas
-        ]
-        post_proc_pipeline = SequentialProcessorPipelineParams(
-            processors=[MultiModelPostProcessorParams(voter=voter, post_processors=post_processors)]
-        )
-
-        with pipeline as rd:
-            post_proc_pipeline = post_proc_pipeline.create(pipeline.pipeline_params, self.data.params)
-
-            results = tqdm_wrapper(
-                self.predict_dataset(rd.input_dataset()),
-                progress_bar=self._params.progress_bar,
-                desc="Prediction",
-                total=len(rd),
-            )
-            for r in post_proc_pipeline.apply(results, run_parallel=False):
-                yield voter.finalize_sample(r)
