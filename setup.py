@@ -42,8 +42,6 @@ setup(
     python_requires=">=3.7",
     install_requires=[r for r in open("requirements.txt").read().split("\n")
         if not r.startswith("git+")],
-    dependency_links=[r for r in open("requirements.txt").read().split("\n")
-        if r.startswith("git+")],
     keywords=["OCR", "optical character recognition", "ocropy", "ocropus", "kraken"],
     data_files=[("", ["requirements.txt"] + resources)],
 )
