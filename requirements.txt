@@ -1,7 +1,7 @@
-edit_distance
-h5py
-lxml
-python-bidi
-tensorflow~=2.4.0
+edit_distance==1.0.6
+h5py==3.1.0
+lxml==4.9.2
+python-bidi==0.4.2
+tensorflow==2.5.1
 git+https://github.com/p42ul/tfaip@3738106#egg=tfaip
-xlsxwriter
+xlsxwriter==3.1.2
